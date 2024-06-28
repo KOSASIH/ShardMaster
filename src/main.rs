@@ -1,42 +1,11 @@
-#! [no_main]
-#! [no_std]
+// File: src/main.rs
 
-// Import necessary dependencies
-extern crate alloc;
-use alloc::{
-    string::{String, ToString},
-    vec::Vec,
-};
-
-use casper_contract::{
-    contract_api::{runtime, storage},
-    unwrap_or_revert::UnwrapOrRevert,
-};
-
-use casper_types::{
-    api_error::ApiError,
-    contracts::{
-        EntryPoint, EntryPointAccess, EntryPointType, EntryPoints, NamedKeys,
-    },
-    CLType, CLValue, URef,
-};
-
-// Define global constants
-const CONTRACT_PACKAGE_NAME: &str = "counter_package_name";
-const CONTRACT_ACCESS_UREF: &str = "counter_access_uref";
-
-const ENTRY_POINT_COUNTER_INC: &str = "counter_inc";
-const ENTRY_POINT_COUNTER_GET: &str = "counter_get";
-
-const COUNT_KEY: &str = "count_key";
-const CONTRACT_VERSION_KEY: &str = "contract_version_key";
-const CONTRACT_KEY: &str = "contract_key";
+// ...
 
 // Define the `call` function
 #[no_mangle]
 pub extern "C" fn call() {
-    // Initialize the count to 0 locally
-    let count_start = storage::new_uref(0_i32);
+    // ...
 
     // Create the entry points for this contract
     let mut counter_entry_points = EntryPoints::new();
@@ -55,23 +24,17 @@ pub extern "C" fn call() {
         EntryPointType::Contract,
     ));
 
-    // In the named keys of the counter contract, add a key for the count.
-    let mut counter_named_keys = NamedKeys::new();
-    let key_name = String::from(COUNT_KEY);
-    counter_named_keys.insert(key_name, count_start.into());
+    // ...
 
-    // Create a new contract package that can be upgraded.
-    let (stored_contract_hash, contract_version) = storage::new_contract(
-        counter_entry_points,
-        Some(counter_named_keys),
-        Some(CONTRACT_PACKAGE_NAME.to_string()),
-        Some(CONTRACT_ACCESS_UREF.to_string()),
+    // Call the `counter_inc` entry point
+    counter::counter_inc();
+
+    // Call the `counter_get` entry point
+    let count: i32 = runtime::call_versioned_contract(
+        stored_contract_hash,
+        None,
+        ENTRY_POINT_COUNTER_GET,
+        Vec::new(),
     );
-
-    // Store the contract version in the context's named keys.
-    let version_uref = storage::new_uref(contract_version);
-    runtime::put_key(CONTRACT_VERSION_KEY, version_uref.into());
-
-    // Create a named key for the contract hash.
-    runtime::put_key(CONTRACT_KEY, stored_contract_hash.into());
-    }
+    runtime::println(&format!("Current count: {}", count));
+}
