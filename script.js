@@ -6,6 +6,7 @@ const ownerPrivateKey = 'your-owner-private-key'; // Replace with your owner pri
 
 const incButton = document.getElementById('inc-button');
 const countElement = document.getElementById('count');
+const ownerElement = document.getElementById('owner');
 
 incButton.addEventListener('click', async () => {
   try {
@@ -36,6 +37,20 @@ incButton.addEventListener('click', async () => {
 
     const count = await countResponse.json();
     countElement.textContent = `Current count: ${count.result}`;
+
+    // Get the contract owner
+    const ownerResponse = await fetch(`${casperUrl}/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contract_hash: contractHash,
+        entry_point: 'get_owner',
+        args: []
+      })
+    });
+
+    const owner = await ownerResponse.json();
+    ownerElement.textContent = `Contract owner: ${owner.result}`;
   } catch (error) {
     console.error(error);
   }
@@ -49,4 +64,4 @@ async function signTransaction(privateKey, tx) {
     tx,
     signature: 'dummy-signature'
   };
-      }
+}
