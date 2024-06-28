@@ -7,53 +7,38 @@ const ownerPrivateKey = 'your-owner-private-key'; // Replace with your owner pri
 const incButton = document.getElementById('inc-button');
 const countElement = document.getElementById('count');
 const ownerElement = document.getElementById('owner');
+const resetButton = document.getElementById('reset-button');
+const transferForm = document.getElementById('transfer-form');
 
 incButton.addEventListener('click', async () => {
+  //...
+});
+
+resetButton.addEventListener('click', async () => {
   try {
     // Sign the transaction with the owner private key
     const signedTx = await signTransaction(ownerPrivateKey, {
       contract_hash: contractHash,
-      entry_point: 'counter_inc',
+      entry_point: 'eset',
       args: []
     });
 
-    // Call the `counter_inc` function
+    // Call the `reset` function
     const response = await fetch(`${casperUrl}/call`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(signedTx)
     });
 
-    // Get the current count
-    const countResponse = await fetch(`${casperUrl}/query`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contract_hash: contractHash,
-        entry_point: 'counter_get',
-        args: []
-      })
-    });
-
-    const count = await countResponse.json();
-    countElement.textContent = `Current count: ${count.result}`;
-
-    // Get the contract owner
-    const ownerResponse = await fetch(`${casperUrl}/query`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contract_hash: contractHash,
-        entry_point: 'get_owner',
-        args: []
-      })
-    });
-
-    const owner = await ownerResponse.json();
-    ownerElement.textContent = `Contract owner: ${owner.result}`;
+    // Update the count element
+    countElement.textContent = 'Current count: 0';
   } catch (error) {
     console.error(error);
   }
+});
+
+transferForm.addEventListener('submit', async (event) => {
+  //...
 });
 
 // Function to sign a transaction with a private key
