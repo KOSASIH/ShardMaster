@@ -31,6 +31,20 @@ impl Counter {
     pub fn counter_get(&self) -> U256 {
         self.count
     }
+
+    // Get the contract owner
+    pub fn get_owner(&self) -> Key {
+        self.owner
+    }
+
+    // Transfer ownership
+    pub fn transfer_ownership(&mut self, new_owner: Key, caller: Key) -> Result<(), ApiError> {
+        if caller != self.owner {
+            return Err(ApiError::Unauthorized);
+        }
+        self.owner = new_owner;
+        Ok(())
+    }
 }
 
 // Define the contract entry points
@@ -43,4 +57,15 @@ pub fn counter_inc() {
 pub fn counter_get() -> U256 {
     let counter: Counter = runtime::get_contract();
     counter.counter_get()
+}
+
+pub fn get_owner() -> Key {
+    let counter: Counter = runtime::get_contract();
+    counter.get_owner()
+}
+
+pub fn transfer_ownership(new_owner: Key) {
+    let counter: Counter = runtime::get_contract();
+    let caller: Key = runtime::get_caller();
+    counter.transfer_ownership(new_owner, caller).unwrap_or_revert();
         }
