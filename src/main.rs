@@ -4,7 +4,7 @@ use clap::{App, Arg};
 fn main() {
     let matches = App::new("Blockchain CLI")
         .version("1.0")
-        .author("Your Name")
+        .author("KOSASIH")
         .about("A command-line interface for the blockchain")
         .arg(Arg::with_name("storage_path")
              .long("storage-path")
