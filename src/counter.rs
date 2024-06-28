@@ -20,7 +20,7 @@ impl Counter {
 
     // Increment the counter
     pub fn counter_inc(&mut self, caller: Key) -> Result<(), ApiError> {
-        if caller != self.owner {
+        if caller!= self.owner {
             return Err(ApiError::Unauthorized);
         }
         self.count += U256::one();
@@ -39,10 +39,19 @@ impl Counter {
 
     // Transfer ownership
     pub fn transfer_ownership(&mut self, new_owner: Key, caller: Key) -> Result<(), ApiError> {
-        if caller != self.owner {
+        if caller!= self.owner {
             return Err(ApiError::Unauthorized);
         }
         self.owner = new_owner;
+        Ok(())
+    }
+
+    // Reset the counter
+    pub fn reset(&mut self, caller: Key) -> Result<(), ApiError> {
+        if caller!= self.owner {
+            return Err(ApiError::Unauthorized);
+        }
+        self.count = U256::zero();
         Ok(())
     }
 }
@@ -68,4 +77,10 @@ pub fn transfer_ownership(new_owner: Key) {
     let counter: Counter = runtime::get_contract();
     let caller: Key = runtime::get_caller();
     counter.transfer_ownership(new_owner, caller).unwrap_or_revert();
+}
+
+pub fn reset() {
+    let counter: Counter = runtime::get_contract();
+    let caller: Key = runtime::get_caller();
+    counter.reset(caller).unwrap_or_revert();
         }
