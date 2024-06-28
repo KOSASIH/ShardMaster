@@ -1,45 +1,77 @@
-use crate::api::BlockchainAPI;
-use clap::{App, Arg};
+#! [no_main]
+#! [no_std]
 
-fn main() {
-    let matches = App::new("Blockchain CLI")
-        .version("1.0")
-        .author("KOSASIH")
-        .about("A command-line interface for the blockchain")
-        .arg(Arg::with_name("storage_path")
-             .long("storage-path")
-             .takes_value(true)
-             .required(true)
-             .help("Path to the storage file"))
-        .arg(Arg::with_name("create_block")
-             .long("create-block")
-             .takes_value(false)
-             .help("Create a new block"))
-        .arg(Arg::with_name("add_transaction")
-             .long("add-transaction")
-             .takes_value(true)
-             .help("Add a new transaction"))
-        .arg(Arg::with_name("get_state")
-             .long("get-state")
-             .takes_value(false)
-             .help("Get the current blockchain state"))
-        .get_matches();
+// Import necessary dependencies
+extern crate alloc;
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
 
-    let storage_path = matches.value_of("storage_path").unwrap();
-    let mut api = BlockchainAPI::new(storage_path);
+use casper_contract::{
+    contract_api::{runtime, storage},
+    unwrap_or_revert::UnwrapOrRevert,
+};
 
-    if let Some(_) = matches.value_of("create_block") {
-        api.create_new_block(vec![]).unwrap();
-        println!("New block created!");
+use casper_types::{
+    api_error::ApiError,
+    contracts::{
+        EntryPoint, EntryPointAccess, EntryPointType, EntryPoints, NamedKeys,
+    },
+    CLType, CLValue, URef,
+};
+
+// Define global constants
+const CONTRACT_PACKAGE_NAME: &str = "counter_package_name";
+const CONTRACT_ACCESS_UREF: &str = "counter_access_uref";
+
+const ENTRY_POINT_COUNTER_INC: &str = "counter_inc";
+const ENTRY_POINT_COUNTER_GET: &str = "counter_get";
+
+const COUNT_KEY: &str = "count_key";
+const CONTRACT_VERSION_KEY: &str = "contract_version_key";
+const CONTRACT_KEY: &str = "contract_key";
+
+// Define the `call` function
+#[no_mangle]
+pub extern "C" fn call() {
+    // Initialize the count to 0 locally
+    let count_start = storage::new_uref(0_i32);
+
+    // Create the entry points for this contract
+    let mut counter_entry_points = EntryPoints::new();
+    counter_entry_points.add_entry_point(EntryPoint::new(
+        ENTRY_POINT_COUNTER_GET,
+        Vec::new(),
+        CLType::I32,
+        EntryPointAccess::Public,
+        EntryPointType::Contract,
+    ));
+    counter_entry_points.add_entry_point(EntryPoint::new(
+        ENTRY_POINT_COUNTER_INC,
+        Vec::new(),
+        CLType::Unit,
+        EntryPointAccess::Public,
+        EntryPointType::Contract,
+    ));
+
+    // In the named keys of the counter contract, add a key for the count.
+    let mut counter_named_keys = NamedKeys::new();
+    let key_name = String::from(COUNT_KEY);
+    counter_named_keys.insert(key_name, count_start.into());
+
+    // Create a new contract package that can be upgraded.
+    let (stored_contract_hash, contract_version) = storage::new_contract(
+        counter_entry_points,
+        Some(counter_named_keys),
+        Some(CONTRACT_PACKAGE_NAME.to_string()),
+        Some(CONTRACT_ACCESS_UREF.to_string()),
+    );
+
+    // Store the contract version in the context's named keys.
+    let version_uref = storage::new_uref(contract_version);
+    runtime::put_key(CONTRACT_VERSION_KEY, version_uref.into());
+
+    // Create a named key for the contract hash.
+    runtime::put_key(CONTRACT_KEY, stored_contract_hash.into());
     }
-
-    if let Some(transaction) = matches.value_of("add_transaction") {
-        let transaction: crate::transaction::Transaction = serde_json::from_str(transaction).unwrap();
-        api.add_transaction(transaction).unwrap();
-        println!("Transaction added!");
-    }
-
-    if let Some(_) = matches.value_of("get_state") {
-        println!("Blockchain state: {:?}", api.get_blockchain_state());
-    }
-}
