@@ -1,31 +1,46 @@
-// File: src/counter.rs
+// File: counter.rs
 
-use casper_contract::{
-    contract_api::{runtime, storage},
-    unwrap_or_revert::UnwrapOrRevert,
-};
+use casper_contract::contract_api::{runtime, storage};
+use casper_types::{ApiError, ContractHash, Key, URef, U256};
 
-use casper_types::{CLValue, URef};
+// Define the contract struct
+pub struct Counter {
+    pub count: U256,
+    pub owner: Key,
+}
 
-const COUNT_KEY: &str = "count_key";
+impl Counter {
+    // Initialize the contract
+    pub fn new(owner: Key) -> Self {
+        Counter {
+            count: U256::zero(),
+            owner,
+        }
+    }
 
+    // Increment the counter
+    pub fn counter_inc(&mut self, caller: Key) -> Result<(), ApiError> {
+        if caller != self.owner {
+            return Err(ApiError::Unauthorized);
+        }
+        self.count += U256::one();
+        Ok(())
+    }
+
+    // Get the current count
+    pub fn counter_get(&self) -> U256 {
+        self.count
+    }
+}
+
+// Define the contract entry points
 pub fn counter_inc() {
-    // Get the current count from storage
-    let count_uref = storage::get_uref(COUNT_KEY).unwrap_or_revert();
-    let mut count: i32 = storage::read(count_uref).unwrap_or_revert();
-
-    // Increment the count
-    count += 1;
-
-    // Store the new count in storage
-    storage::write(count_uref, count);
+    let counter: Counter = runtime::get_contract();
+    let caller: Key = runtime::get_caller();
+    counter.counter_inc(caller).unwrap_or_revert();
 }
 
-pub fn counter_get() -> CLValue {
-    // Get the current count from storage
-    let count_uref = storage::get_uref(COUNT_KEY).unwrap_or_revert();
-    let count: i32 = storage::read(count_uref).unwrap_or_revert();
-
-    // Return the count as a CLValue
-    CLValue::from_t(count).unwrap_or_revert()
-}
+pub fn counter_get() -> U256 {
+    let counter: Counter = runtime::get_contract();
+    counter.counter_get()
+        }
