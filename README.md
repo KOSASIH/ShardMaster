@@ -14,7 +14,11 @@
 [![UNESCO Open Science](https://img.shields.io/badge/UNESCO-Open%20Science-blue.svg)](https://en.unesco.org/science-sustainable-future/open-science)
 [![W3C](https://img.shields.io/badge/W3C-Valid-blue.svg)](https://www.w3.org/)
 [![GDPR](https://img.shields.io/badge/GDPR-Compliant-green.svg)](https://ec.europa.eu/commission/priorities/justice-and-fundamental-rights/data-protection_en)
-
+[![ISO 14001:2015](https://img.shields.io/badge/ISO%2014001-2015-green.svg)](https://www.iso.org/iso-14001-environmental-management.html)
+[![IEC 62443](https://img.shields.io/badge/IEC%2062443-Industrial%20Automation%20Security-red.svg)](https://www.iec.ch/functionalsafety/)
+[![NIST 800-171](https://img.shields.io/badge/NIST%20800--171-Controlled%20Unclassified%20Information-blue.svg)](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-171.pdf)
+[![OpenID Foundation](https://img.shields.io/badge/OpenID%20Foundation-Certified-green.svg)](https://openid.net/certification/)
+[![CSA STAR](https://img.shields.io/badge/CSA%20STAR-Registered-blue.svg)](https://www.cloudsecurityalliance.org/star/)
 
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/KOSASIH/ShardMaster">PiScale</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://www.linkedin.com/in/kosasih-81b46b5a">KOSASIH</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">Creative Commons Attribution 4.0 International<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""></a></p>
 
